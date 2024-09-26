@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
 
-# Dummy data for training (replace with real stock data)
+# Dummy data for training for stock prediction AAPL
+
 X_train = np.array([1, 2, 3, 4, 5], dtype=float)
 y_train = np.array([5, 7, 9, 11, 13], dtype=float)
 
