@@ -52,7 +52,7 @@ def supertrend(df, period, multiplier, column_prefix):
 
 
 # Download sample data
-symbol = "AAPL"
+symbol = "RANI"  # Decling Stock currently
 data = yf.download(symbol, start="2022-01-01", end="2023-01-01")
 
 # Calculate SuperTrend with different parameters
