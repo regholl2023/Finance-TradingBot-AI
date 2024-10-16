@@ -6,7 +6,8 @@ def atr(data, period=3):
     data['high-low'] = data['high'] - data['low']
     data['high-close'] = np.abs(data['high'] - data['close'].shift())
     data['low-close'] = np.abs(data['low'] - data['close'].shift())
-    tr = data[['high-low', 'high-close', 'low-close']].max(axis=1)
+    tr = data[['high-low', 'high-close', 'low-close']
+              ].max(axis=1, skipna=False)
     atr = tr.rolling(period).mean()
     return atr
 
