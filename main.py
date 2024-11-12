@@ -34,27 +34,30 @@ df_aapl = pd.DataFrame(data_aapl)
 # Calculate Supertrend for AAPL
 supertrend_aapl = supertrend(df_aapl)
 
-# Use Supertrend values (you can add it as a feature or use it for signals)
+# Ensure that `supertrend` is not NaN for all entries
+if supertrend_aapl['supertrend'].isnull().all():
+    raise ValueError(
+        "All values in Supertrend are NaN. Check the supertrend calculation.")
+
+# Use Supertrend values as feature for training
 X_train = np.array(supertrend_aapl['supertrend']).reshape(-1, 1)
 y_train = np.array(goog_bars['close']).reshape(-1, 1)
 
-# Handle mismatched data lengths (optional but recommended)
+# Handle mismatched data lengths
 min_length = min(len(X_train), len(y_train))
 X_train = X_train[:min_length]
 y_train = y_train[:min_length]
 
-# Remove NaN values, if any
-X_train = X_train[~np.isnan(X_train)]
-y_train = y_train[~np.isnan(y_train)]
+# Remove rows with NaN values in X_train and y_train
+mask = ~np.isnan(X_train) & ~np.isnan(y_train)
+X_train = X_train[mask].reshape(-1, 1)
+y_train = y_train[mask].reshape(-1, 1)
 
-# Reshape the data for training
-X_train = X_train.reshape(-1, 1)
-y_train = y_train.reshape(-1, 1)
-
-# Scale the data
-scaler = MinMaxScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-y_train_scaled = scaler.fit_transform(y_train)
+# Separate scalers for X_train and y_train
+scaler_X = MinMaxScaler()
+scaler_y = MinMaxScaler()
+X_train_scaled = scaler_X.fit_transform(X_train)
+y_train_scaled = scaler_y.fit_transform(y_train)
 
 # Build the model
 model = tf.keras.Sequential([
@@ -69,7 +72,9 @@ model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=0.001),
 model.fit(X_train_scaled, y_train_scaled, epochs=500)
 
 # Predict using the most recent close price from AAPL
-prediction = model.predict(scaler.transform([[aapl_bars['close'][-1]]]))
-predicted_value = scaler.inverse_transform(prediction)
+most_recent_close = aapl_bars['close'].iloc[-1]
+scaled_prediction_input = scaler_X.transform([[most_recent_close]])
+prediction_scaled = model.predict(scaled_prediction_input)
+predicted_value = scaler_y.inverse_transform(prediction_scaled)
 
 print(f"Prediction for next stock value: {predicted_value[0][0]}")

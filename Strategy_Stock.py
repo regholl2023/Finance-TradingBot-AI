@@ -12,34 +12,32 @@ def atr(data, period=3):
     return atr
 
 
-def supertrend(data, period=3, multiplier=3):
-    hl2 = (data['high'] + data['low']) / 2
-    data['atr'] = atr(data, period)
-    data['upperband'] = hl2 + (multiplier * data['atr'])
-    data['lowerband'] = hl2 - (multiplier * data['atr'])
+def supertrend(data):
+    # Calculate ATR and initialize columns for supertrend values
+    data['supertrend'] = np.nan
     data['in_uptrend'] = True
 
-    for i in range(1, len(data)):
-        current, previous = i, i-1
+    for current in range(1, len(data)):
+        previous = current - 1
 
-        if data['close'][current] > data['upperband'][previous]:
-            data.loc[current, 'in_uptrend'] = True
-        elif data['close'][current] < data['lowerband'][previous]:
-            data.loc[current, 'in_uptrend'] = False
-        else:
-            data.loc[current, 'in_uptrend'] = data['in_uptrend'][previous]
+        if 'upperband' in data.columns and 'lowerband' in data.columns:
+            # Access values using iloc to avoid KeyError
+            if data['close'].iloc[current] > data['upperband'].iloc[previous]:
+                data.loc[current, 'in_uptrend'] = True
+            elif data['close'].iloc[current] < \
+                    data['lowerband'].iloc[previous]:
+                data.loc[current, 'in_uptrend'] = False
+            else:
+                data.loc[current, 'in_uptrend'] = \
+                    data['in_uptrend'].iloc[previous]
 
-        if (data['in_uptrend'][current] and
-                data['lowerband'][current] < data['lowerband'][previous]):
-            data.loc[current, 'lowerband'] = data['lowerband'][previous]
-
-        if (not data['in_uptrend'][current] and
-                data['upperband'][current] > data['upperband'][previous]):
-            data.loc[current, 'upperband'] = data['upperband'][previous]
-
-    data['supertrend'] = np.where(data['in_uptrend'],
-                                  data['lowerband'],
-                                  data['upperband'])
+            # Set supertrend value based on the trend direction
+            if data['in_uptrend'].iloc[current]:
+                data.loc[current, 'supertrend'] = \
+                    data['lowerband'].iloc[current]
+            else:
+                data.loc[current, 'supertrend'] = \
+                    data['upperband'].iloc[current]
 
     return data
 
