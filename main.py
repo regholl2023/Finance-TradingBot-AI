@@ -4,6 +4,7 @@ import alpaca_trade_api as tradeapi
 from alpaca_trade_api.rest import TimeFrame
 import pandas as pd
 from typing import List, Dict, Tuple
+import time
 from Strategy_Stock import supertrend
 
 
@@ -135,41 +136,46 @@ def execute_trade(
 def main():
     # Initialize API and read symbols
     api = initialize_api()
-    symbols = read_symbols('symbols.txt')
+    symbols = read_symbols(
+        '/Users/shreyas/Desktop/FinanceAi/stock_symbols.txt')
 
     # Track current positions
     current_positions = {}
 
-    # Process each symbol
-    for symbol in symbols:
-        try:
-            print(f"\nProcessing {symbol}...")
+    # Run indefinitely
+    while True:
+        for symbol in symbols:
+            try:
+                print(f"\nProcessing {symbol}...")
 
-            # Get stock data
-            df = get_stock_data(api, symbol)
+                # Get stock data
+                df = get_stock_data(api, symbol)
 
-            # Calculate supertrends
-            st1, st2, st3 = calculate_supertrends(df)
+                # Calculate supertrends
+                st1, st2, st3 = calculate_supertrends(df)
 
-            # Check signals
-            action = check_signals(st1, st2, st3, current_positions)
+                # Check signals
+                action = check_signals(st1, st2, st3, current_positions)
 
-            # Execute trades
-            current_positions = execute_trade(
-                api,
-                symbol,
-                action,
-                current_positions
-            )
+                # Execute trades
+                current_positions = execute_trade(
+                    api,
+                    symbol,
+                    action,
+                    current_positions
+                )
 
-        except Exception as e:
-            print(f"Error processing {symbol}: {str(e)}")
-            continue
+            except Exception as e:
+                print(f"Error processing {symbol}: {str(e)}")
+                continue
 
-    # Print final positions
-    print("\nCurrent positions:")
-    for symbol, position in current_positions.items():
-        print(f"{symbol}: {position}")
+        # Print current positions after processing all symbols
+        print("\nCurrent positions:")
+        for symbol, position in current_positions.items():
+            print(f"{symbol}: {position}")
+
+        # Delay to control the frequency of execution (e.g., 5 minutes)
+        time.sleep(300)  # 300 seconds = 5 minutes
 
 
 if __name__ == "__main__":
