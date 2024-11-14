@@ -1,4 +1,4 @@
-# Automated Stock Trading using Alpaca API and TensorFlow
+# Automated Stock Trading using Alpaca API, TensorFlow And Jenkins
 
 This project aims to automate stock trading using the **Alpaca API** for real-time market data and trade execution. **TensorFlow** is used for implementing machine learning models, while different trading strategies, including the **Supertrend** indicator, are being tested to optimize trade performance. The code is designed to run automatically and execute trades based on defined strategies.
 
@@ -16,6 +16,7 @@ This project is based on trading strategies provided in this video : https://www
 2. **TensorFlow ML Integration**: Machine learning models are applied to predict stock price movements or optimize trade execution.
 3. **Supertrend Indicator**: The Supertrend strategy is implemented to generate buy/sell signals based on market trends.
 4. **Automated Trading**: Once a strategy generates a signal, the bot automatically executes the trade on the Alpaca platform.
+5. **Jenkins Integration**: Setup Jenkins to indefintely run program untill manually abort - http://localhost:8080/job/StockProject/lastBuild/
 
 
 ## Usage
