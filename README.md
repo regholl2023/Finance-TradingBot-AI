@@ -37,12 +37,18 @@ This project is based on trading strategies provided in this video : https://www
 
 - **`Strategy_Stock.py`**: Contains various trading strategies that are tested and implemented in this project. Currently, the **Supertrend** strategy is implemented.
 
+## Alpaca API - Just launched program  
+
+![Graph of Alpaca Stocks](graph.png)
+
 ## Future Work
 
 - Implement additional strategies like **Moving Average Crossovers**, **RSI**, and **Machine Learning-based Predictions**.
 - Improve the Supertrend strategy by optimizing parameters based on backtesting results.
 - Integrate more complex TensorFlow models for predictive trading.
 - Add more logging and error handling for production readiness.
+
+  
 
 
 ## Disclaimer
