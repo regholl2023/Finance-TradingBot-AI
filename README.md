@@ -41,6 +41,11 @@ This project is based on trading strategies provided in this video : https://www
 
 ![Graph of Alpaca Stocks](graph.png)
 
+![Graph of Alpaca Stocks](stocks.png)
+
+Just launched program - hopefully we can see results later and tune program better. Currently only buying one stock from stock list, next time make it buy more and see better results. 
+This program is more on the testing purposes and will enhance later!
+
 ## Future Work
 
 - Implement additional strategies like **Moving Average Crossovers**, **RSI**, and **Machine Learning-based Predictions**.
