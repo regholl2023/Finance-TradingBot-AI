@@ -1,5 +1,6 @@
 import alpaca_trade_api as tradeapi
 import time
+import pandas as pd
 import os
 
 # Alpaca API credentials from env
@@ -19,14 +20,20 @@ if account.status != "ACTIVE":
 # Settings
 symbol = "AAPL"  # Stock to trade
 cash_to_invest = 100000  # Simulated cash
-sma_short_window = 5  # Short SMA window
-sma_long_window = 20  # Long SMA window
+sma_short_window = 2  # Short SMA window
+sma_long_window = 5  # Long SMA window
 
 
 def get_historical_data(symbol, timeframe="1Min", limit=100):
     """Fetch historical market data for the given symbol."""
-    bars = auth.get_bars(symbol, timeframe, limit=limit).df
-    return bars.reset_index()
+    print(f"Fetching data for {symbol} at {time.ctime()}")
+    try:
+        bars = auth.get_bars(symbol, timeframe, limit=limit).df
+        print(f"Fetched {len(bars)} rows of data.")
+        return bars.reset_index()
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+        return pd.DataFrame()
 
 
 def calculate_sma(data, window):
@@ -51,33 +58,42 @@ def place_order(symbol, qty, side):
 
 def trading_strategy():
     """Implement the trading strategy."""
-    global cash_to_invest
+    try:
+        global cash_to_invest
+        data = get_historical_data(symbol, timeframe="1Min", limit=100)
+        data['sma_short'] = calculate_sma(data, sma_short_window)
+        data['sma_long'] = calculate_sma(data, sma_long_window)
 
-    # Get historical data
-    data = get_historical_data(symbol, timeframe="1Min", limit=100)
-    data['sma_short'] = calculate_sma(data, sma_short_window)
-    data['sma_long'] = calculate_sma(data, sma_long_window)
+        latest_data = data.iloc[-1]
+        prev_data = data.iloc[-2]
 
-    # Check the latest data
-    latest_data = data.iloc[-1]
-    prev_data = data.iloc[-2]
+        print(
+            f"Latest Data - SMA Short: {latest_data['sma_short']}, "
+            f"SMA Long: {latest_data['sma_long']}"
+        )
+        print(
+            f"Previous Data - SMA Short: {prev_data['sma_short']}, "
+            f"SMA Long: {prev_data['sma_long']}"
+        )
 
-    # Check for crossover
-    if (prev_data['sma_short'] <= prev_data['sma_long'] and
-            latest_data['sma_short'] > latest_data['sma_long']):
-        # Buy signal
-        qty = int(cash_to_invest / latest_data['close'])
-        place_order(symbol, qty, "buy")
-        cash_to_invest -= qty * latest_data['close']
+        if (prev_data['sma_short'] <= prev_data['sma_long'] and
+                latest_data['sma_short'] > latest_data['sma_long']):
+            print("Buy signal detected.")
+            qty = int(cash_to_invest / latest_data['close'])
+            place_order(symbol, qty, "buy")
+            cash_to_invest -= qty * latest_data['close']
 
-    elif (prev_data['sma_short'] >= prev_data['sma_long'] and
-          latest_data['sma_short'] < latest_data['sma_long']):
-        # Sell signal
-        position = auth.get_position(symbol)
-        if position:
-            qty = position.qty
-            place_order(symbol, qty, "sell")
-            cash_to_invest += qty * latest_data['close']
+        elif (prev_data['sma_short'] >= prev_data['sma_long'] and
+              latest_data['sma_short'] < latest_data['sma_long']):
+            print("Sell signal detected.")
+            position = auth.get_position(symbol)
+            if position:
+                qty = int(position.qty)
+                place_order(symbol, qty, "sell")
+                cash_to_invest += qty * latest_data['close']
+
+    except Exception as e:
+        print(f"Error in trading strategy: {e}")
 
 
 if __name__ == "__main__":
