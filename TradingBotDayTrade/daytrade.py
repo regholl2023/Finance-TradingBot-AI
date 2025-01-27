@@ -18,10 +18,10 @@ if account.status != "ACTIVE":
     raise Exception("Account is not active. Please check your Alpaca account.")
 
 # Settings
-symbol = "AAPL"  # Stock to trade
+symbol = "TSLA"  # Stock to trade
 cash_to_invest = 100000  # Simulated cash
-sma_short_window = 2  # Short SMA window
-sma_long_window = 5  # Long SMA window
+sma_short_window = 1  # Short SMA window
+sma_long_window = 2  # Long SMA window
 
 
 def get_historical_data(symbol, timeframe="1Min", limit=100):
