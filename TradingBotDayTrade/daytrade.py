@@ -18,7 +18,7 @@ if account.status != "ACTIVE":
     raise Exception("Account is not active. Please check your Alpaca account.")
 
 # Settings
-symbol = "TSLA"  # Stock to trade
+symbol = "NVDA"  # Stock to trade
 cash_to_invest = 100000  # Simulated cash
 sma_short_window = 1  # Short SMA window
 sma_long_window = 2  # Long SMA window
